@@ -21,7 +21,7 @@ data "archive_file" "store_payload_lambda_function" {
 resource "aws_iam_role" "store_payload_lambda_function" {
   name = "${var.store_payload_lambda_function_name}-lambda-function-role"
 
-  assume_role_policy = jsondecode({
+  assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "store_payload_lambda_function_cloudwatch_access_
 
   role = aws_iam_role.store_payload_lambda_function.id
 
-  policy = jsondecode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -67,7 +67,7 @@ resource "aws_iam_role_policy" "store_payload_lambda_function_datastore_access_p
 
   role = aws_iam_role.store_payload_lambda_function.id
 
-  policy = jsondecode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -263,7 +263,7 @@ resource "aws_dynamodb_table_item" "datastore_total_count_item" {
   table_name = aws_dynamodb_table.datastore.name
   hash_key = aws_dynamodb_table.datastore.hash_key
 
-  item = jsondecode({
+  item = jsonencode({
     PK = {
       S = var.datastore_total_count_item_key
     },
