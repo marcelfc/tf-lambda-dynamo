@@ -41,7 +41,6 @@ jobs:
 
       - name: Destroy existing Terraform Configuration
         id: destroy
-        if: ${{ github.event.inputs.recreate }}
         run: |
           terraform destroy \
             -var="aws_region=${{ env.AWS_REGION }}" \
