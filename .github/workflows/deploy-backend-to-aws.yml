@@ -39,7 +39,7 @@ jobs:
         id: plan
         run: |
           terraform plan \
-          -var="state_bucket_name=${{ env.TF_BACKEND_STATE_BUCKET }} \
+          -var="state_bucket_name=${{ env.TF_BACKEND_STATE_BUCKET }}" \
           -var="locks_table_name=${{ env.TF_BACKEND_LOCKS_DYNAMODB_TABLE }}" \
           -var="aws_region=${{ env.AWS_REGION }}" \
           -no-color -input=false
