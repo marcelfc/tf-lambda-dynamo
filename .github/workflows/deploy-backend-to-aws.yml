@@ -1,0 +1,55 @@
+name: Deploy Terraform backend to AWS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    name: "Deploy Terraform backend to AWS using Terraform"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./backend
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_BACKEND_STATE_BUCKET: ${{ vars.TF_BACKEND_STATE_BUCKET }}
+      TF_BACKEND_LOCKS_DYNAMODB_TABLE: ${{ vars.TF_BACKEND_LOCKS_DYNAMODB_TABLE }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Terraform CLI
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Init Terraform Configuration
+        id: init
+        run: terraform init
+
+      - name: Validate Terraform Configuration
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan \
+          -var="state_bucket_name=${{ env.TF_BACKEND_STATE_BUCKET }} \
+          -var="locks_table_name=${{ env.TF_BACKEND_LOCKS_DYNAMODB_TABLE }}" \
+          -var="aws_region=${{ env.AWS_REGION }}" \
+          -no-color -input=false
+
+      - name: Terraform Apply
+        id: apply
+        run: |
+          terraform apply \
+            -var="state_bucket_name=${{ env.TF_BACKEND_STATE_BUCKET }}" \
+            -var="locks_table_name=${{ env.TF_BACKEND_LOCKS_DYNAMODB_TABLE }}" \
+            -var="aws_region=${{ env.AWS_REGION }}" \
+            -auto-approve \
+            -input=false
